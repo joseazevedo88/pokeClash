@@ -4,3 +4,9 @@
   height: 100vh;
   overflow: auto;
 }
+
+.container {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 5rem;
+}
