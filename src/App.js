@@ -8,9 +8,17 @@ class App extends Component {
     return (
       <div className="App">
         <AppNavbar />
-        <div className="container">
+        <div className="container" style={{ marginTop: '2rem' }}>
           <Poke />
-          <div style={{ marginTop: 'auto', marginBottom: 'auto' }}>VS</div>
+          <div
+            style={{
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              fontFamily: 'Oswald'
+            }}
+          >
+            VS
+          </div>
           <Poke />
         </div>
       </div>
