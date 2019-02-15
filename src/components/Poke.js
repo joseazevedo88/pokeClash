@@ -28,12 +28,12 @@ export class Poke extends Component {
 
   getPokemon = () => {
     //gets a first gen pokemon, first gen master race
-    const pokemonNumber = Math.floor(Math.random() * 151);
+    const pokemonNumber = Math.ceil(Math.random() * 150);
     let attacksArray = [];
     axios
       .get(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
       .then(res => {
-        console.log(res);
+        console.log(res); //delete afterwards
         this.getAttackNumbers(res.data.moves.length).forEach(number => {
           attacksArray.push(res.data.moves[number]);
         });
@@ -70,8 +70,8 @@ export class Poke extends Component {
           alt=""
         />
         <div style={attackStyle}>
-          {this.state.attacks.map(attack => (
-            <Button className="btn" style={buttonStyle}>
+          {this.state.attacks.map((attack, index) => (
+            <Button className="btn" style={buttonStyle(index)}>
               {this.cleanString(attack.move.name)}
             </Button>
           ))}
@@ -83,16 +83,20 @@ export class Poke extends Component {
 
 const attackStyle = {
   justifyContent: 'center',
-  flexWrap: 'row'
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gridTemplateAreas: "'button1 button2' 'button3 button4'"
 };
 
-const buttonStyle = {
-  minWidth: '44%',
-  margin: '3%',
-  backgroundColor: 'rgb(230, 230, 255)',
-  border: '0',
-  color: 'black',
-  fontFamily: 'Oswald'
+const buttonStyle = id => {
+  return {
+    gridArea: `button${id + 1}`,
+    margin: '5%',
+    backgroundColor: 'rgb(230, 230, 255)',
+    border: '0',
+    color: 'black',
+    fontFamily: 'Oswald'
+  };
 };
 
 export default Poke;
