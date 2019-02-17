@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, Row, Col } from 'reactstrap';
+import { Button } from 'reactstrap';
+import { capitalizeString, cleanString } from '../Strings';
 
 export class Poke extends Component {
   constructor(props) {
@@ -8,29 +9,23 @@ export class Poke extends Component {
     this.state = {
       name: '',
       sprite: '',
-      attacks: []
+      attacks: [],
+      stats: []
     };
   }
 
-  componentDidMount() {
-    this.getPokemon();
+  async componentDidMount() {
+    await this.getPokemon();
+    //transfer state to parent component
+    this.props.getPokeProps(this.state.stats, this.props.isCPU);
   }
 
-  capitalizeString = str =>
-    str
-      .charAt(0)
-      .toUpperCase()
-      .concat(str.slice(1));
-
-  replaceDashWithSpace = str => str.replace(/-/g, ' ');
-
-  cleanString = str => this.capitalizeString(this.replaceDashWithSpace(str));
-
-  getPokemon = () => {
+  getPokemon = async () => {
     //gets a first gen pokemon, first gen master race
     const pokemonNumber = Math.ceil(Math.random() * 150);
     let attacksArray = [];
-    axios
+
+    await axios
       .get(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
       .then(res => {
         console.log(res); //delete afterwards
@@ -38,9 +33,10 @@ export class Poke extends Component {
           attacksArray.push(res.data.moves[number]);
         });
         this.setState({
-          name: this.capitalizeString(res.data.name),
+          name: capitalizeString(res.data.name),
           sprite: res.data.sprites.front_default,
-          attacks: attacksArray
+          attacks: attacksArray,
+          stats: res.data.stats
         });
       });
   };
@@ -60,22 +56,31 @@ export class Poke extends Component {
   render() {
     return (
       <div>
-        <p style={{ fontFamily: 'Oswald', fontSize: '3rem' }}>
-          {this.state.name}
-        </p>
+        <h1 style={{ fontFamily: 'Oswald' }}>{this.state.name}</h1>
+        {/* wait for the stats array to be filled so we can display hp value */}
+        <p>{this.state.stats[5] && this.state.stats[5].base_stat} HP</p>
         <img
           className="img-fluid"
           src={this.state.sprite}
           style={{ minHeight: '20rem' }}
           alt=""
         />
-        <div style={attackStyle}>
-          {this.state.attacks.map((attack, index) => (
-            <Button className="btn" style={buttonStyle(index)}>
-              {this.cleanString(attack.move.name)}
-            </Button>
-          ))}
-        </div>
+        {/* only renders buttons for the first pokemon 
+        revise this to implement 1v1 without cpu */}
+        {!this.props.isCPU && (
+          <div style={attackStyle}>
+            {this.state.attacks.map((attack, index) => (
+              <Button
+                key={index}
+                className="btn"
+                style={buttonStyle(index)}
+                onClick={this.props.attackUsed.bind(this, attack)}
+              >
+                {cleanString(attack.move.name)}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
