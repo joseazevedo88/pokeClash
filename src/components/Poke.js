@@ -17,7 +17,12 @@ export class Poke extends Component {
   async componentDidMount() {
     await this.getPokemon();
     //transfer state to parent component
-    this.props.getPokeProps(this.state.stats, this.props.isCPU);
+    this.props.getPokeProps(
+      this.state.stats,
+      this.state.attacks,
+      this.state.stats[5].base_stat,
+      this.props.isCPU
+    );
   }
 
   getPokemon = async () => {
@@ -58,7 +63,8 @@ export class Poke extends Component {
       <div>
         <h1 style={{ fontFamily: 'Oswald' }}>{this.state.name}</h1>
         {/* wait for the stats array to be filled so we can display hp value */}
-        <p>{this.state.stats[5] && this.state.stats[5].base_stat} HP</p>
+        {/* <p>{this.state.stats[5] && this.state.stats[5].base_stat} HP</p> */}
+        <p>{this.props.hp} HP</p>
         <img
           className="img-fluid"
           src={this.state.sprite}
