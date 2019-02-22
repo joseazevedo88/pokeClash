@@ -7,7 +7,6 @@ import axios from 'axios';
 
 class App extends Component {
   state = {
-    attack: '',
     battleHistory: [],
     poke1: {
       stats: [],
@@ -21,36 +20,57 @@ class App extends Component {
     }
   };
 
-  //carregar botão, ir buscar info do ataque, tirar hp ao poke 2, escolher um ataque do poke 2, ir buscar info do ataque e tirar hp ao poke1
-
-  attackUsed = attack => {
-    console.log(attack);
-
-    axios.get(attack.move.url).then(atk => {
-      //we'll divide atk power by 5 because base is very high and idk how the algo for pokemon
-      //fights goes so that's that
-      const attackPower = atk.data.power / 5;
-      console.log(this.state.poke2.hp, attackPower);
-      const poke2HpAfterAttack = this.state.poke2.hp - attackPower;
-      console.log(poke2HpAfterAttack);
+  updateState = (attack, attackPower, attackingPokemon, pokeHpAfterAttack) => {
+    if (attackingPokemon === 1) {
       this.setState({
+        battleHistory: [
+          ...this.state.battleHistory,
+          `${cleanString(attack.move.name)} caused ${attackPower} dmg`
+        ],
         poke2: {
-          hp: poke2HpAfterAttack
+          hp: pokeHpAfterAttack,
+          attacks: [...this.state.poke2.attacks]
         }
       });
-    });
+    } else {
+      this.setState({
+        battleHistory: [
+          ...this.state.battleHistory,
+          `${cleanString(attack.move.name)} caused ${attackPower} dmg`
+        ],
+        poke1: {
+          hp: pokeHpAfterAttack
+        }
+      });
+    }
+  };
 
-    this.setState({
-      attack: attack.move.name,
-      battleHistory: [
-        ...this.state.battleHistory,
-        `${cleanString(attack.move.name)} caused x dmg`
-      ]
-    });
+  dealDamage = async (attack, attackingPokemon) => {
+    //get move info
+    const atk = await axios.get(attack.move.url);
+    //we'll divide atk power by 5 because base is very high and idk how the algo for pokemon
+    //fights goes so that's that
+    const attackPower = atk.data.power / 5;
+    let pokeHpAfterAttack = 0;
+    if (attackingPokemon === 1)
+      pokeHpAfterAttack = this.state.poke2.hp - attackPower;
+    else pokeHpAfterAttack = this.state.poke1.hp - attackPower;
+
+    this.updateState(attack, attackPower, attackingPokemon, pokeHpAfterAttack);
+  };
+
+  attackUsed = async attack => {
+    //poke1 will attack
+    this.dealDamage(attack, 1);
+
+    //select attack from poke2's array
+    const randomNumber = Math.floor(Math.random() * 4);
+    const poke2Attack = this.state.poke2.attacks[randomNumber];
+    //poke2 will fight back
+    this.dealDamage(poke2Attack, 2);
   };
 
   getPokeProps = (stats, pokemon2Attacks, hp, isCPU) => {
-    console.log('asd', stats);
     if (!isCPU) {
       this.setState({
         poke1: {
@@ -66,7 +86,6 @@ class App extends Component {
           hp: hp
         }
       });
-    console.log(this.state.poke1, this.state.poke2);
   };
 
   render() {
@@ -82,6 +101,7 @@ class App extends Component {
           }}
         >
           <Poke
+            // isCPU="false"
             attackUsed={this.attackUsed}
             getPokeProps={this.getPokeProps}
             hp={this.state.poke1.hp}
@@ -103,7 +123,9 @@ class App extends Component {
           <div style={{ fontFamily: 'Oswald' }}>
             <h1>Battle: </h1>
             {this.state.battleHistory.map((turn, index) => (
-              <p key={index}>{turn}</p>
+              <p key={index} style={{ marginTop: '1rem' }}>
+                {turn}
+              </p>
             ))}
           </div>
         </div>

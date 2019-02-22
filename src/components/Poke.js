@@ -17,6 +17,7 @@ export class Poke extends Component {
   async componentDidMount() {
     await this.getPokemon();
     //transfer state to parent component
+    console.log('dei render', this.props);
     this.props.getPokeProps(
       this.state.stats,
       this.state.attacks,
@@ -33,7 +34,6 @@ export class Poke extends Component {
     await axios
       .get(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
       .then(res => {
-        console.log(res); //delete afterwards
         this.getAttackNumbers(res.data.moves.length).forEach(number => {
           attacksArray.push(res.data.moves[number]);
         });
@@ -64,7 +64,7 @@ export class Poke extends Component {
         <h1 style={{ fontFamily: 'Oswald' }}>{this.state.name}</h1>
         {/* wait for the stats array to be filled so we can display hp value */}
         {/* <p>{this.state.stats[5] && this.state.stats[5].base_stat} HP</p> */}
-        <p>{this.props.hp} HP</p>
+        <p style={{ marginTop: '1rem' }}>{this.props.hp} HP</p>
         <img
           className="img-fluid"
           src={this.state.sprite}
