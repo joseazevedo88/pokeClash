@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import { Button } from 'reactstrap';
+import axios from 'axios';
 import { capitalizeString, cleanString } from '../Strings';
 
 export class Poke extends Component {
@@ -24,6 +24,13 @@ export class Poke extends Component {
       this.state.stats[5].base_stat,
       this.props.isCPU
     );
+  }
+
+  componentWillReceiveProps(props) {
+    const { update } = this.props;
+    if (props.update !== update) {
+      this.componentDidMount();
+    }
   }
 
   getPokemon = async () => {
@@ -58,6 +65,14 @@ export class Poke extends Component {
     return attacksArray;
   };
 
+  getStyle = () => {
+    return {
+      minHeight: '20rem',
+      transform: this.props.rotate ? 'rotate(180deg)' : 'none',
+      transitionDuration: '500ms'
+    };
+  };
+
   render() {
     return (
       <div>
@@ -68,7 +83,7 @@ export class Poke extends Component {
         <img
           className="img-fluid"
           src={this.state.sprite}
-          style={{ minHeight: '20rem' }}
+          style={this.getStyle()}
           alt=""
         />
         {/* only renders buttons for the first pokemon 
