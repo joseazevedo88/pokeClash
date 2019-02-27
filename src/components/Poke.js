@@ -17,7 +17,6 @@ export class Poke extends Component {
   async componentDidMount() {
     await this.getPokemon();
     //transfer state to parent component
-    console.log('dei render', this.props);
     this.props.getPokeProps(
       this.state.stats,
       this.state.attacks,

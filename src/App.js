@@ -4,7 +4,7 @@ import { Poke } from './components/Poke';
 import './App.css';
 import { cleanString } from './Strings';
 import axios from 'axios';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalBody, ModalFooter } from 'reactstrap';
 
 class App extends Component {
   state = {
@@ -28,6 +28,13 @@ class App extends Component {
   toggle = () => {
     this.setState({
       modal: !this.state.modal
+    });
+  };
+
+  update = () => {
+    this.setState({
+      update: !this.state.update,
+      battleHistory: []
     });
   };
 
@@ -71,8 +78,10 @@ class App extends Component {
     //get move info
     const atk = await axios.get(attack.move.url);
     //we'll divide atk power by 5 because base is very high and idk how the algo for pokemon
-    //fights goes so that's that
-    const attackPower = atk.data.power / 5;
+    //fights goes so that's that, then multiply by random number between 0.5 and 1.5 so fights have more variety
+    const attackPower = Math.floor(
+      (atk.data.power / 5) * (Math.random() + 0.5)
+    );
     let pokeHpAfterAttack = 0;
     if (attackingPokemon === 1)
       pokeHpAfterAttack = this.state.poke2.hp - attackPower;
@@ -87,6 +96,7 @@ class App extends Component {
   attackUsed = async attack => {
     //poke1 will attack
     await this.dealDamage(attack, 1);
+
     //check if game over
     if (this.state.poke2.hp <= 0) {
       //toggle modal
@@ -94,6 +104,7 @@ class App extends Component {
         winner: 'poke1'
       });
       this.toggle();
+      return;
     }
     //select attack from poke2's array
     const randomNumber = Math.floor(Math.random() * 4);
@@ -145,7 +156,8 @@ class App extends Component {
           style={{
             display: 'flex',
             marginTop: '2rem',
-            justifyContent: 'space-evenly'
+            justifyContent: 'space-evenly',
+            fontFamily: 'Oswald'
           }}
         >
           <Poke
@@ -159,8 +171,7 @@ class App extends Component {
           <div
             style={{
               marginTop: 'auto',
-              marginBottom: 'auto',
-              fontFamily: 'Oswald'
+              marginBottom: 'auto'
             }}
           >
             VS
@@ -172,16 +183,37 @@ class App extends Component {
             rotate={this.state.rotate}
             update={this.state.update}
           />
-          <div style={{ fontFamily: 'Oswald' }}>
+          <div>
             <h1>Battle: </h1>
             {this.state.battleHistory.map((turn, index) => (
-              <p key={index} style={{ marginTop: '1rem' }}>
+              <p
+                key={index}
+                style={
+                  index % 2
+                    ? { marginTop: '1rem', color: '#0066ff' }
+                    : { marginTop: '1rem', color: '#ff471a' }
+                }
+              >
                 {turn}
               </p>
             ))}
           </div>
-          <Modal isOpen={this.state.modal} toggle={this.toggle}>
-            <ModalBody>{text}</ModalBody>
+          <Modal
+            isOpen={this.state.modal}
+            toggle={this.toggle}
+            style={{ marginTop: '10rem' }}
+            backdrop="static"
+          >
+            <ModalBody style={{ textAlign: 'center' }}>
+              {text}
+              <span>
+                <img
+                  src="http://static.pokemonpets.com/images/monsters-images-300-300/2025-Shiny-Pikachu.png"
+                  style={{ marginTop: '2rem' }}
+                  alt="pikachu"
+                />
+              </span>
+            </ModalBody>
             <ModalFooter>
               <Button color="primary" onClick={this.toggleAndUpdate}>
                 Play again!
@@ -189,6 +221,19 @@ class App extends Component {
             </ModalFooter>
           </Modal>
         </div>
+        <Button
+          style={{
+            marginLeft: '75%',
+            backgroundColor: 'rgb(249, 245, 255)',
+            border: 'none',
+            color: 'black',
+            fontFamily: 'Oswald',
+            padding: '0.5rem 2rem'
+          }}
+          onClick={this.update}
+        >
+          Reroll Pokemon
+        </Button>
       </div>
     );
   }
