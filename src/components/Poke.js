@@ -72,13 +72,41 @@ export class Poke extends Component {
     };
   };
 
+  hpBarFillingStyle = hp => {
+    let baseHp = hp;
+    if (this.state.stats[5] !== undefined) {
+      baseHp = this.state.stats[5].base_stat;
+    }
+    let percentage = (hp * 100) / baseHp;
+    if (percentage <= 10) percentage = 10;
+    return {
+      position: 'absolute',
+      backgroundColor: '#74d365',
+      height: '100%',
+      width: `${percentage}%`,
+      top: '0',
+      borderRadius: '1em'
+    };
+  };
+
   render() {
     return (
       <div>
         <h1 style={{ fontFamily: 'Oswald' }}>{this.state.name}</h1>
         {/* wait for the stats array to be filled so we can display hp value */}
-        {/* <p>{this.state.stats[5] && this.state.stats[5].base_stat} HP</p> */}
-        <p style={{ marginTop: '1rem' }}>{this.props.hp} HP</p>
+        <div style={hpBarStyle}>
+          <p
+            style={{
+              position: 'relative',
+              zIndex: '1',
+              marginTop: '0.2rem'
+            }}
+          >
+            {this.props.hp} HP
+          </p>
+          <div style={this.hpBarFillingStyle(this.props.hp)} />
+        </div>
+
         <img
           className="img-fluid"
           src={this.state.sprite}
@@ -111,6 +139,16 @@ const attackStyle = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   gridTemplateAreas: "'button1 button2' 'button3 button4'"
+};
+
+const hpBarStyle = {
+  marginTop: '3rem',
+  position: 'relative',
+  width: '100%',
+  height: '2rem',
+  color: 'white',
+  borderRadius: '1rem',
+  border: '1px solid rgba(0, 153, 68, 1)'
 };
 
 const buttonStyle = id => {

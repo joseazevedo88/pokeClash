@@ -55,7 +55,8 @@ class App extends Component {
         ],
         poke2: {
           hp: pokeHpAfterAttack,
-          attacks: [...this.state.poke2.attacks]
+          attacks: [...this.state.poke2.attacks],
+          stats: [...this.state.poke2.stats]
         }
       });
     } else {
@@ -65,7 +66,8 @@ class App extends Component {
           `${cleanString(attack.move.name)} caused ${attackPower} dmg`
         ],
         poke1: {
-          hp: pokeHpAfterAttack
+          hp: pokeHpAfterAttack,
+          stats: [...this.state.poke1.stats]
         }
       });
     }
@@ -94,30 +96,66 @@ class App extends Component {
   };
 
   attackUsed = async attack => {
-    //poke1 will attack
-    await this.dealDamage(attack, 1);
+    console.log(
+      this.state.poke1.stats[0].base_stat,
+      this.state.poke2.stats[0].base_stat
+    );
+    if (
+      this.state.poke1.stats[0].base_stat > this.state.poke2.stats[0].base_stat
+    ) {
+      //poke1 will attack
+      await this.dealDamage(attack, 1);
 
-    //check if game over
-    if (this.state.poke2.hp <= 0) {
-      //toggle modal
-      this.setState({
-        winner: 'poke1'
-      });
-      this.toggle();
-      return;
-    }
-    //select attack from poke2's array
-    const randomNumber = Math.floor(Math.random() * 4);
-    const poke2Attack = this.state.poke2.attacks[randomNumber];
-    //poke2 will fight back
-    await this.dealDamage(poke2Attack, 2);
+      //check if game over
+      if (this.state.poke2.hp <= 0) {
+        //toggle modal
+        this.setState({
+          winner: 'poke1'
+        });
+        this.toggle();
+        return;
+      }
 
-    if (this.state.poke1.hp <= 0) {
-      this.setState({
-        winner: 'poke2'
-      });
-      //toggle modal
-      this.toggle();
+      //select attack from poke2's array
+      const randomNumber = Math.floor(Math.random() * 4);
+      const poke2Attack = this.state.poke2.attacks[randomNumber];
+      //poke2 will fight back
+      await this.dealDamage(poke2Attack, 2);
+
+      if (this.state.poke1.hp <= 0) {
+        this.setState({
+          winner: 'poke2'
+        });
+        //toggle modal
+        this.toggle();
+      }
+    } else {
+      //select attack from poke2's array
+      const randomNumber = Math.floor(Math.random() * 4);
+      const poke2Attack = this.state.poke2.attacks[randomNumber];
+      //poke2 will fight back
+      await this.dealDamage(poke2Attack, 2);
+
+      if (this.state.poke1.hp <= 0) {
+        this.setState({
+          winner: 'poke2'
+        });
+        //toggle modal
+        this.toggle();
+      }
+
+      //poke1 will attack
+      await this.dealDamage(attack, 1);
+
+      //check if game over
+      if (this.state.poke2.hp <= 0) {
+        //toggle modal
+        this.setState({
+          winner: 'poke1'
+        });
+        this.toggle();
+        return;
+      }
     }
   };
 
@@ -171,7 +209,8 @@ class App extends Component {
           <div
             style={{
               marginTop: 'auto',
-              marginBottom: 'auto'
+              marginBottom: 'auto',
+              fontSize: '3rem'
             }}
           >
             VS
