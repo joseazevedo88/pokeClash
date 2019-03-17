@@ -208,8 +208,7 @@ class App extends Component {
           />
           <div
             style={{
-              marginTop: 'auto',
-              marginBottom: 'auto',
+              marginTop: '20%',
               fontSize: '3rem'
             }}
           >
@@ -229,8 +228,8 @@ class App extends Component {
                 key={index}
                 style={
                   index % 2
-                    ? { marginTop: '1rem', color: '#0066ff' }
-                    : { marginTop: '1rem', color: '#ff471a' }
+                    ? { marginTop: '1rem', color: 'black' }
+                    : { marginTop: '1rem', color: 'red' }
                 }
               >
                 {turn}

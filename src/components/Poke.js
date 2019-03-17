@@ -85,7 +85,8 @@ export class Poke extends Component {
       height: '100%',
       width: `${percentage}%`,
       top: '0',
-      borderRadius: '1em'
+      borderRadius: '1em',
+      transitionDuration: '500ms'
     };
   };
 
